@@ -1,5 +1,5 @@
-// Service Worker simples para cache offline
-const CACHE = 'treino-tatiane-v1';
+// Cache offline básico
+const CACHE = 'treino-tatiane-v2';
 const ASSETS = ['./','./index.html','./manifest.webmanifest'];
 self.addEventListener('install', (e)=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))); });
 self.addEventListener('activate', (e)=>{ e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); });

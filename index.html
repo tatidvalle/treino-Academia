@@ -1,158 +1,270 @@
 <!DOCTYPE html>
-<html lang='pt-BR'>
+<html lang="pt-BR">
 <head>
-<meta charset='utf-8' />
-<meta name='viewport' content='width=device-width, initial-scale=1' />
-<title>Treino da Tatiane</title>
-<link rel='manifest' href='manifest.webmanifest'>
-<meta name='theme-color' content='#6C5CE7' />
-<style>
-  :root { --bg:#0f0f12; --card:#171821; --muted:#aab0c0; --text:#f6f6f9; --accent:#6C5CE7; }
-  *{ box-sizing:border-box }
-  body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
-  header{ position:sticky; top:0; background:linear-gradient(180deg, rgba(12,12,18,.95), rgba(12,12,18,.85)); backdrop-filter: blur(6px); padding:14px 16px; z-index:10; border-bottom: 1px solid rgba(255,255,255,.06) }
-  h1{ font-size:20px; margin:0 0 6px 0 }
-  .subtitle{ font-size:12px; color:var(--muted) }
-  .container{ padding:16px; max-width:720px; margin:0 auto }
-  .tabs{ display:flex; gap:6px; margin:12px 0 16px }
-  .tab{ padding:8px 10px; border-radius:10px; background: #10121a; color:var(--muted); border:1px solid rgba(255,255,255,.06); cursor:pointer; font-size:13px }
-  .tab.active{ color:#fff; background:var(--accent); border-color:transparent }
-  .card{ background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px 14px; margin-bottom:16px }
-  .card h2{ font-size:16px; margin:0 0 10px 0 }
-  .item{ display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,.05) }
-  .item:last-child{ border-bottom:none }
-  input[type=checkbox]{ width:20px; height:20px; accent-color: var(--accent); margin-top:3px }
-  label{ flex:1; line-height:1.35 }
-  .hint{ color:var(--muted); font-size:12px }
-  .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
-  button{ background:var(--accent); color:white; border:none; border-radius:12px; padding:10px 12px; font-size:14px; cursor:pointer }
-  button.secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,.15) }
-  .footer{ text-align:center; color:var(--muted); font-size:12px; margin:18px 0 40px }
-  .timer{ display:flex; align-items:center; gap:6px }
-  .big{ font-size:22px; font-weight:700 }
-  .install{ display:none }
-  .visible{ display:inline-flex }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Treino da Tatiane</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#6C5CE7" />
+  <style>
+    :root { --bg:#0f0f12; --card:#171821; --muted:#aab0c0; --text:#f6f6f9; --accent:#6C5CE7; --ok:#2ecc71; --input:#0f1118; }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+    header{ position:sticky; top:0; background:linear-gradient(180deg, rgba(12,12,18,.95), rgba(12,12,18,.85)); backdrop-filter: blur(6px); padding:14px 16px; z-index:10; border-bottom: 1px solid rgba(255,255,255,.06) }
+    h1{ font-size:20px; margin:0 0 6px 0 }
+    .subtitle{ font-size:12px; color:var(--muted) }
+    .container{ padding:16px; max-width:860px; margin:0 auto }
+    .tabs{ display:flex; gap:6px; margin:12px 0 16px; flex-wrap:wrap }
+    .tab{ padding:8px 10px; border-radius:10px; background: #10121a; color:var(--muted); border:1px solid rgba(255,255,255,.06); cursor:pointer; font-size:13px }
+    .tab.active{ color:#fff; background:var(--accent); border-color:transparent }
+    .card{ background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px 14px; margin-bottom:16px }
+    .card h2{ font-size:16px; margin:0 0 10px 0 }
+    .item{ display:block; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,.08) }
+    .item:last-child{ border-bottom:none }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    .line{ display:flex; gap:8px; align-items:center; margin-top:8px }
+    input[type=checkbox]{ width:18px; height:18px; accent-color: var(--accent) }
+    label{ line-height:1.35 }
+    .titleRow{ display:flex; align-items:center; gap:10px }
+    .exTitle{ font-weight:600 }
+    .sets{ display:grid; grid-template-columns: 74px 1fr 1fr 1fr 1fr; gap:8px; width:100%; margin-top:8px }
+    .sets .h{ color:var(--muted); font-size:12px }
+    input[type=number], input[type=text]{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:var(--input); color:#fff }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button{ -webkit-appearance: none; margin:0 }
+    textarea{ width:100%; padding:10px; min-height:70px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:var(--input); color:#fff }
+    .hint{ color:var(--muted); font-size:12px }
+    .btn{ background:var(--accent); color:white; border:none; border-radius:12px; padding:10px 12px; font-size:14px; cursor:pointer }
+    .btn.secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,.15) }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:8px }
+    @media(max-width:700px){ .sets{ grid-template-columns: 64px 1fr 1fr 1fr 1fr } }
+  </style>
 </head>
 <body>
-<header>
-  <h1>Treino da Tatiane</h1>
-  <div class='subtitle'>Checklist interativo • Funciona offline • Salva seu progresso</div>
-</header>
-<div class='container'>
-  <div class='tabs' id='tabs'></div>
-  <div class='row'>
-    <div class='timer card' style='flex:1; align-items:center; justify-content:space-between'>
-      <div>
-        <div class='hint'>Cronômetro de descanso</div>
-        <div class='big' id='timer'>00:45</div>
+  <header>
+    <h1>Treino da Tatiane</h1>
+    <div class="subtitle">Checklist com cargas e repetições por série • Funciona offline • Salva no aparelho</div>
+  </header>
+  <div class="container">
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="hint">Cronômetro de descanso</div>
+        <div class="row" style="justify-content:space-between; margin-top:6px">
+          <div class="row" style="gap:10px; align-items:baseline">
+            <div style="font-size:24px; font-weight:700" id="timer">00:45</div>
+            <div class="hint">seg</div>
+          </div>
+          <div class="row">
+            <button class="btn" id="startBtn">Iniciar</button>
+            <button class="btn secondary" id="resetBtn">Resetar</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <label class="hint">Tempo (s):</label>
+          <input type="number" id="timerInput" min="10" max="300" step="5" value="45" style="max-width:120px">
+        </div>
       </div>
-      <div class='row'>
-        <button id='startBtn'>Iniciar</button>
-        <button class='secondary' id='resetBtn'>Resetar</button>
+      <div class="card">
+        <div class="hint">Ações</div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn secondary" id="clearDayBtn">Limpar dia</button>
+          <button class="btn secondary" id="clearAllBtn">Limpar tudo</button>
+          <button class="btn secondary" id="exportBtn">Exportar .json</button>
+          <input type="file" id="importInput" accept="application/json" style="display:none" />
+          <button class="btn secondary" id="importBtn">Importar</button>
+        </div>
       </div>
     </div>
-    <div class='card' style='flex:1'>
-      <div class='hint'>Configurações rápidas</div>
-      <div class='row'>
-        <button id='installBtn' class='install'>Instalar app</button>
-        <button class='secondary' id='clearDayBtn'>Limpar dia</button>
-      </div>
+
+    <div id="content"></div>
+
+    <div class="card">
+      <div class="hint">Anotações do dia</div>
+      <textarea id="notes" placeholder="Ex.: hoje aumentei a carga no leg press; focar em técnica no agachamento..."></textarea>
     </div>
+
   </div>
-  <div id='content'></div>
-  <div class='footer'>Dica: marque os exercícios conforme for concluindo. O progresso fica salvo neste aparelho.</div>
-</div>
+
 <script>
-const PLAN = {
-  'Segunda – Pernas (Quadríceps)': [
-    'Agachamento Barra Guiada – 4 séries (falha)',
-    'Leg Press 45° – 4 séries (falha)',
-    'Cadeira Extensora – 4 séries (falha)',
-    'Agachamento Taça – 3 séries (falha)',
-    'BI-SET: Leg Press 45° – 3×15',
-    'BI-SET: Agachamento Taça – 3×15'
-  ],
-  'Terça – Bíceps + Costas': [
-    'Rosca Direta – 3 séries (falha)',
-    'Rosca Polia Corda – 3 séries (falha)',
-    'BI-SET: Remada Serrote – 3×12',
-    'BI-SET: Remada Curvada Barra – 3×12',
-    'Remada Baixa Triângulo – 3 séries (falha)',
-    'Puxada Invertida – 3 séries (falha)'
-  ],
-  'Quarta – Posterior + Glúteo': [
-    'Cadeira Flexora – 4 séries (falha)',
-    'Mesa Flexora – 4 séries (falha)',
-    'Stiff com Halter – 4 séries (falha)',
-    'Leg Press Pés Altos – 3 séries (falha)',
-    'Stiff com Barra – 4 séries (falha)'
-  ],
-  'Quinta – Ombro + Tríceps': [
-    'Desenvolvimento Halter Sentada – 3×12',
-    'Elevação Lateral Sentada – 3×12',
-    'Elevação Frontal (corda cross) – falha',
-    'Tríceps Barra Cross – falha',
-    'Tríceps Unilateral – 3×45s',
-    'BI-SET: Tríceps Francês – 3×10'
-  ],
-  'Sexta – Glúteo + Abdutora': [
-    'Chute na Polia – falha',
-    'Cadeira Abdutora – falha',
-    'Chute 4 Apoios com Caneleira – falha',
-    'Leg Press Pés Abertos – falha',
-    'Elevação Pélvica – falha',
-    'Elevação Pélvica Unilateral – falha'
-  ]
-};
-const keyFor = (d)=>`treino-tatiane::${d}`;
-const load = (d)=>JSON.parse(localStorage.getItem(keyFor(d))||'{}');
-const save = (d,v)=>localStorage.setItem(keyFor(d), JSON.stringify(v));
-const tabsEl = document.getElementById('tabs');
-const contentEl = document.getElementById('content');
-let activeDay = Object.keys(PLAN)[new Date().getDay()-1];
-if(!PLAN[activeDay]) activeDay = 'Segunda – Pernas (Quadríceps)';
-function renderTabs(){
-  tabsEl.innerHTML='';
-  Object.keys(PLAN).forEach(day=>{
-    const b=document.createElement('button');
-    b.className='tab'+(day===activeDay?' active':'');
-    b.textContent=day.split(' – ')[0];
-    b.onclick=()=>{ activeDay=day; renderTabs(); renderDay(); };
-    tabsEl.appendChild(b);
-  });
-}
-function renderDay(){
-  const saved=load(activeDay);
-  contentEl.innerHTML='';
-  const card=document.createElement('div'); card.className='card';
-  const h2=document.createElement('h2'); h2.textContent=activeDay; card.appendChild(h2);
-  PLAN[activeDay].forEach((txt, idx)=>{
-    const row=document.createElement('div'); row.className='item';
-    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!saved[idx];
-    cb.onchange=()=>{ saved[idx]=cb.checked; save(activeDay, saved); };
-    const label=document.createElement('label'); label.textContent=txt;
-    row.appendChild(cb); row.appendChild(label); card.appendChild(row);
-  });
-  contentEl.appendChild(card);
-}
-renderTabs(); renderDay();
-// Limpar dia
- document.getElementById('clearDayBtn').onclick=()=>{
-   if(confirm('Apagar marcações do dia atual?')){ localStorage.removeItem(keyFor(activeDay)); renderDay(); }
- };
-// Timer 45s
- let timerId=null; let remaining=45; const timerEl=document.getElementById('timer');
- const startBtn=document.getElementById('startBtn'); const resetBtn=document.getElementById('resetBtn');
- function format(s){ const m=Math.floor(s/60); const ss=(s%60).toString().padStart(2,'0'); return `${m.toString().padStart(2,'0')}:${ss}`; }
- function tick(){ remaining--; timerEl.textContent=format(remaining); if(remaining<=0){ clearInterval(timerId); timerId=null; remaining=45; timerEl.textContent='00:45'; try{ new Audio('data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYBYWFhYWFhYQ==').play(); }catch(e){} alert('Tempo!'); } }
- startBtn.onclick=()=>{ if(timerId) return; timerId=setInterval(tick,1000); };
- resetBtn.onclick=()=>{ clearInterval(timerId); timerId=null; remaining=45; timerEl.textContent='00:45'; };
-// PWA
- if('serviceWorker' in navigator){ navigator.serviceWorker.register('./service-worker.js'); }
- let deferredPrompt; const installBtn=document.getElementById('installBtn');
- window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; installBtn.classList.add('visible'); });
- installBtn.addEventListener('click', async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if(outcome==='accepted'){ installBtn.classList.remove('visible'); } deferredPrompt=null; });
+  // ------ Plano base ------
+  const PLAN = {
+    'Segunda – Pernas (Quadríceps)': [
+      'Agachamento Barra Guiada – 4 séries (falha)',
+      'Leg Press 45° – 4 séries (falha)',
+      'Cadeira Extensora – 4 séries (falha)',
+      'Agachamento Taça – 3 séries (falha)',
+      'BI-SET: Leg Press 45° – 3×15',
+      'BI-SET: Agachamento Taça – 3×15'
+    ],
+    'Terça – Bíceps + Costas': [
+      'Rosca Direta – 3 séries (falha)',
+      'Rosca Polia Corda – 3 séries (falha)',
+      'BI-SET: Remada Serrote – 3×12',
+      'BI-SET: Remada Curvada Barra – 3×12',
+      'Remada Baixa Triângulo – 3 séries (falha)',
+      'Puxada Invertida – 3 séries (falha)'
+    ],
+    'Quarta – Posterior + Glúteo': [
+      'Cadeira Flexora – 4 séries (falha)',
+      'Mesa Flexora – 4 séries (falha)',
+      'Stiff com Halter – 4 séries (falha)',
+      'Leg Press Pés Altos – 3 séries (falha)',
+      'Stiff com Barra – 4 séries (falha)'
+    ],
+    'Quinta – Ombro + Tríceps': [
+      'Desenvolvimento Halter Sentada – 3×12',
+      'Elevação Lateral Sentada – 3×12',
+      'Elevação Frontal (corda cross) – falha',
+      'Tríceps Barra Cross – falha',
+      'Tríceps Unilateral – 3×45s',
+      'BI-SET: Tríceps Francês – 3×10'
+    ],
+    'Sexta – Glúteo + Abdutora': [
+      'Chute na Polia – falha',
+      'Cadeira Abdutora – falha',
+      'Chute 4 Apoios com Caneleira – falha',
+      'Leg Press Pés Abertos – falha',
+      'Elevação Pélvica – falha',
+      'Elevação Pélvica Unilateral – falha'
+    ]
+  };
+
+  // ------ Storage helpers ------
+  const keyFor = (day) => `treino-tatiane::v2::${day}`;
+  const load = (day) => JSON.parse(localStorage.getItem(keyFor(day))||'{}');
+  const save = (day, data) => localStorage.setItem(keyFor(day), JSON.stringify(data));
+  const loadNotes = (day) => localStorage.getItem(keyFor(day)+':notes')||'';
+  const saveNotes = (day, v) => localStorage.setItem(keyFor(day)+':notes', v);
+
+  // ------ UI refs ------
+  const tabsEl = document.getElementById('tabs');
+  const contentEl = document.getElementById('content');
+  const notesEl = document.getElementById('notes');
+
+  // Dia ativo automático (Seg a Sex)
+  let activeDay = Object.keys(PLAN)[new Date().getDay()-1];
+  if(!PLAN[activeDay]) activeDay = 'Segunda – Pernas (Quadríceps)';
+
+  function renderTabs(){
+    tabsEl.innerHTML = '';
+    Object.keys(PLAN).forEach(day => {
+      const b = document.createElement('button');
+      b.className = 'tab' + (day===activeDay?' active':'');
+      b.textContent = day.split(' – ')[0];
+      b.onclick = ()=>{ activeDay = day; renderTabs(); renderDay(); };
+      tabsEl.appendChild(b);
+    });
+  }
+
+  function ensureSetsArray(saved, idx, defaultSets){
+    if(!saved[idx]) saved[idx] = { done:false, sets: defaultSets.map(()=>({peso:'', reps:''})) };
+    if(!saved[idx].sets) saved[idx].sets = defaultSets.map(()=>({peso:'', reps:''}));
+    return saved[idx];
+  }
+
+  function parseTargetSets(txt){
+    // tenta detectar número de séries: pega primeiro número que antecede '×' ou 'x' ou a palavra 'série'
+    const m1 = txt.match(/(\d+)\s*[×x]/i);
+    if(m1) return parseInt(m1[1]);
+    const m2 = txt.match(/(\d+)\s*séries?/i);
+    if(m2) return parseInt(m2[1]);
+    // padrão
+    return 4;
+  }
+
+  function renderDay(){
+    const saved = load(activeDay);
+    notesEl.value = loadNotes(activeDay);
+    notesEl.oninput = () => saveNotes(activeDay, notesEl.value);
+
+    contentEl.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'card';
+    const h2 = document.createElement('h2');
+    h2.textContent = activeDay;
+    card.appendChild(h2);
+
+    PLAN[activeDay].forEach((txt, idx)=>{
+      const row = document.createElement('div');
+      row.className='item';
+
+      // linha de título + checkbox
+      const title = document.createElement('div');
+      title.className='titleRow';
+      const cb = document.createElement('input');
+      cb.type='checkbox';
+      const targetSets = parseTargetSets(txt);
+      const exState = ensureSetsArray(saved, idx, Array.from({length:targetSets}));
+      cb.checked = !!exState.done;
+      cb.onchange = ()=>{ exState.done = cb.checked; save(activeDay, saved); };
+      const t = document.createElement('div'); t.className='exTitle'; t.textContent = txt;
+      title.appendChild(cb); title.appendChild(t);
+      row.appendChild(title);
+
+      // grid de séries
+      const grid = document.createElement('div');
+      grid.className='sets';
+      const headings = ['Série', 'Peso (kg)', 'Reps', 'Peso (kg)', 'Reps'];
+      headings.forEach((h,i)=>{ const d=document.createElement('div'); d.textContent=h; d.className='h'; if(i>2) d.style.display='none'; grid.appendChild(d); });
+
+      // Render sets (até 6 por segurança)
+      const numSets = Math.min(Math.max(targetSets, exState.sets.length), 6);
+      exState.sets.length = numSets;
+      for(let s=0; s<numSets; s++){
+        const label = document.createElement('div'); label.textContent = `${s+1}`; label.className='h'; grid.appendChild(label);
+        const peso = document.createElement('input'); peso.type='number'; peso.inputMode='decimal'; peso.placeholder='ex.: 20'; peso.value = exState.sets[s]?.peso||''; peso.oninput = ()=>{ exState.sets[s] = exState.sets[s]||{peso:'', reps:''}; exState.sets[s].peso = peso.value; save(activeDay, saved); };
+        const reps = document.createElement('input'); reps.type='number'; reps.placeholder='ex.: 12'; reps.value = exState.sets[s]?.reps||''; reps.oninput = ()=>{ exState.sets[s] = exState.sets[s]||{peso:'', reps:''}; exState.sets[s].reps = reps.value; save(activeDay, saved); };
+        grid.appendChild(peso); grid.appendChild(reps);
+        // slots ocultos para responsividade (mantém grid 5 colunas)
+        const h3 = document.createElement('div'); h3.style.display='none'; grid.appendChild(h3);
+        const h4 = document.createElement('div'); h4.style.display='none'; grid.appendChild(h4);
+      }
+
+      row.appendChild(grid);
+      card.appendChild(row);
+    });
+
+    contentEl.appendChild(card);
+    save(activeDay, saved);
+  }
+
+  renderTabs();
+  renderDay();
+
+  // ------ Timer ------
+  let timerId=null; let base=45; let remaining=base;
+  const timerEl=document.getElementById('timer');
+  const timerInput=document.getElementById('timerInput');
+  function format(s){ const m=Math.floor(s/60); const ss=(s%60).toString().padStart(2,'0'); return `${m.toString().padStart(2,'0')}:${ss}` }
+  function tick(){ remaining--; timerEl.textContent = format(remaining); if(remaining<=0){ clearInterval(timerId); timerId=null; remaining=base; timerEl.textContent=format(base); try{ new Audio('data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYBYWFhYWFhYQ==').play(); }catch(e){} alert('Tempo!'); } }
+  document.getElementById('startBtn').onclick = ()=>{ if(timerId) return; timerId=setInterval(tick,1000); };
+  document.getElementById('resetBtn').onclick = ()=>{ clearInterval(timerId); timerId=null; remaining=base; timerEl.textContent=format(base); };
+  timerInput.onchange = ()=>{ const v = Math.max(10, Math.min(300, parseInt(timerInput.value||'45'))); base=v; remaining=v; timerEl.textContent=format(v); };
+
+  // ------ Actions ------
+  document.getElementById('clearDayBtn').onclick = ()=>{ if(confirm('Apagar dados do dia atual?')){ localStorage.removeItem(keyFor(activeDay)); renderDay(); } };
+  document.getElementById('clearAllBtn').onclick = ()=>{ if(confirm('Apagar TODOS os dados de treino?')){ Object.keys(localStorage).filter(k=>k.startsWith('treino-tatiane::v2::')).forEach(k=>localStorage.removeItem(k)); renderDay(); } };
+
+  document.getElementById('exportBtn').onclick = ()=>{
+    const data = {};
+    Object.keys(PLAN).forEach(day=>{ data[day] = { notes: loadNotes(day), data: load(day) }; });
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'treino_tatiane_export.json'; a.click(); URL.revokeObjectURL(a.href);
+  };
+
+  const importBtn = document.getElementById('importBtn');
+  const importInput = document.getElementById('importInput');
+  importBtn.onclick = ()=> importInput.click();
+  importInput.onchange = ()=>{
+    const f = importInput.files[0]; if(!f) return; const r = new FileReader();
+    r.onload = ()=>{ try{ const obj = JSON.parse(r.result); Object.keys(obj||{}).forEach(day=>{ localStorage.setItem(keyFor(day), JSON.stringify(obj[day].data||{})); localStorage.setItem(keyFor(day)+':notes', obj[day].notes||''); }); alert('Importado com sucesso!'); renderDay(); }catch(e){ alert('Arquivo inválido.'); } };
+    r.readAsText(f);
+  };
+
+  // PWA
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./service-worker.js'); }
 </script>
 </body>
 </html>
