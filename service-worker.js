@@ -1,16 +1,16 @@
-// Service Worker V3: atualização imediata
-const CACHE = 'treino-tatiane-v3';
+
+// Service Worker V4: atualização imediata + nova versão de cache
+const CACHE = 'treino-tatiane-v4';
 const ASSETS = ['./','./index.html','./manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // ativa a nova versão sem esperar
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll(ASSETS))
   );
 });
 
 self.addEventListener('activate', (event) => {
-  // assume controle das páginas abertas
   self.clients.claim();
   event.waitUntil(
     caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))

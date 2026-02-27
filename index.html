@@ -1,1 +1,274 @@
-<!DOCTYPE html><html><head><meta charset='utf-8'><title>Treino V3</title><link rel='manifest' href='manifest.webmanifest'></head><body><h1>Treino V3</h1><script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./service-worker.js'); }</script></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Treino da Tatiane</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#6C5CE7" />
+  <style>
+    :root { --bg:#0f0f12; --card:#171821; --muted:#aab0c0; --text:#f6f6f9; --accent:#6C5CE7; --ok:#2ecc71; --input:#0f1118; }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+    header{ position:sticky; top:0; background:linear-gradient(180deg, rgba(12,12,18,.95), rgba(12,12,18,.85)); backdrop-filter: blur(6px); padding:14px 16px; z-index:10; border-bottom: 1px solid rgba(255,255,255,.06) }
+    h1{ font-size:20px; margin:0 0 4px 0 }
+    .subtitle{ font-size:12px; color:var(--muted) }
+    .container{ padding:16px; max-width:900px; margin:0 auto }
+    .tabs{ display:flex; gap:6px; margin:12px 0 16px; flex-wrap:wrap }
+    .tab{ padding:8px 10px; border-radius:10px; background: #10121a; color:var(--muted); border:1px solid rgba(255,255,255,.06); cursor:pointer; font-size:13px }
+    .tab.active{ color:#fff; background:var(--accent); border-color:transparent }
+    .card{ background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px 14px; margin-bottom:16px }
+    .card h2{ font-size:16px; margin:0 0 10px 0 }
+    .item{ display:block; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,.08) }
+    .item:last-child{ border-bottom:none }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    input[type=checkbox]{ width:18px; height:18px; accent-color: var(--accent) }
+    .titleRow{ display:flex; align-items:center; gap:10px }
+    .exTitle{ font-weight:600 }
+    .controls{ display:flex; align-items:center; gap:8px; margin:8px 0 }
+    .badge{ font-size:12px; color:var(--muted) }
+    .btnTiny{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.2); padding:2px 8px; border-radius:8px; cursor:pointer }
+    .sets{ display:grid; grid-template-columns: 74px 1fr 1fr; gap:8px; width:100%; margin-top:4px }
+    .sets .h{ color:var(--muted); font-size:12px }
+    input[type=number], input[type=text]{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:var(--input); color:#fff }
+    textarea{ width:100%; padding:10px; min-height:70px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:var(--input); color:#fff }
+    .hint{ color:var(--muted); font-size:12px }
+    .btn{ background:var(--accent); color:white; border:none; border-radius:12px; padding:10px 12px; font-size:14px; cursor:pointer }
+    .btn.secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,.15) }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:8px }
+    @media(max-width:700px){ .sets{ grid-template-columns: 64px 1fr 1fr } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Treino da Tatiane <span class="badge">• V4 (séries dinâmicas)</span></h1>
+    <div class="subtitle">Checklist com cargas/reps por série • Funciona offline • Salva no aparelho</div>
+  </header>
+  <div class="container">
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="hint">Cronômetro de descanso</div>
+        <div class="row" style="justify-content:space-between; margin-top:6px">
+          <div class="row" style="gap:10px; align-items:baseline">
+            <div style="font-size:24px; font-weight:700" id="timer">00:45</div>
+            <div class="hint">seg</div>
+          </div>
+          <div class="row">
+            <button class="btn" id="startBtn">Iniciar</button>
+            <button class="btn secondary" id="resetBtn">Resetar</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <label class="hint">Tempo (s):</label>
+          <input type="number" id="timerInput" min="10" max="300" step="5" value="45" style="max-width:120px">
+        </div>
+      </div>
+      <div class="card">
+        <div class="hint">Ações</div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn secondary" id="clearDayBtn">Limpar dia</button>
+          <button class="btn secondary" id="clearAllBtn">Limpar tudo</button>
+          <button class="btn secondary" id="exportBtn">Exportar .json</button>
+          <input type="file" id="importInput" accept="application/json" style="display:none" />
+          <button class="btn secondary" id="importBtn">Importar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="content"></div>
+
+    <div class="card">
+      <div class="hint">Anotações do dia</div>
+      <textarea id="notes" placeholder="Ex.: hoje aumentei a carga no leg press; focar em técnica no agachamento..."></textarea>
+    </div>
+
+  </div>
+
+<script>
+  // ------ Plano base ------
+  const PLAN = {
+    'Segunda – Pernas (Quadríceps)': [
+      'Agachamento Barra Guiada – 4 séries (falha)',
+      'Leg Press 45° – 4 séries (falha)',
+      'Cadeira Extensora – 4 séries (falha)',
+      'Agachamento Taça – 3 séries (falha)',
+      'BI-SET: Leg Press 45° – 3×15',
+      'BI-SET: Agachamento Taça – 3×15'
+    ],
+    'Terça – Bíceps + Costas': [
+      'Rosca Direta – 3 séries (falha)',
+      'Rosca Polia Corda – 3 séries (falha)',
+      'BI-SET: Remada Serrote – 3×12',
+      'BI-SET: Remada Curvada Barra – 3×12',
+      'Remada Baixa Triângulo – 3 séries (falha)',
+      'Puxada Invertida – 3 séries (falha)'
+    ],
+    'Quarta – Posterior + Glúteo': [
+      'Cadeira Flexora – 4 séries (falha)',
+      'Mesa Flexora – 4 séries (falha)',
+      'Stiff com Halter – 4 séries (falha)',
+      'Leg Press Pés Altos – 3 séries (falha)',
+      'Stiff com Barra – 4 séries (falha)'
+    ],
+    'Quinta – Ombro + Tríceps': [
+      'Desenvolvimento Halter Sentada – 3×12',
+      'Elevação Lateral Sentada – 3×12',
+      'Elevação Frontal (corda cross) – falha',
+      'Tríceps Barra Cross – falha',
+      'Tríceps Unilateral – 3×45s',
+      'BI-SET: Tríceps Francês – 3×10'
+    ],
+    'Sexta – Glúteo + Abdutora': [
+      'Chute na Polia – falha',
+      'Cadeira Abdutora – falha',
+      'Chute 4 Apoios com Caneleira – falha',
+      'Leg Press Pés Abertos – falha',
+      'Elevação Pélvica – falha',
+      'Elevação Pélvica Unilateral – falha'
+    ]
+  };
+
+  // ------ Storage helpers ------
+  const keyFor = (day) => `treino-tatiane::v4::${day}`; // nova chave p/ evitar conflito com v2
+  const load = (day) => JSON.parse(localStorage.getItem(keyFor(day))||'{}');
+  const save = (day, data) => localStorage.setItem(keyFor(day), JSON.stringify(data));
+  const loadNotes = (day) => localStorage.getItem(keyFor(day)+':notes')||'';
+  const saveNotes = (day, v) => localStorage.setItem(keyFor(day)+':notes', v);
+
+  // ------ UI refs ------
+  const tabsEl = document.getElementById('tabs');
+  const contentEl = document.getElementById('content');
+  const notesEl = document.getElementById('notes');
+
+  // Dia ativo automático (Seg a Sex)
+  let activeDay = Object.keys(PLAN)[new Date().getDay()-1];
+  if(!PLAN[activeDay]) activeDay = 'Segunda – Pernas (Quadríceps)';
+
+  function renderTabs(){
+    tabsEl.innerHTML = '';
+    Object.keys(PLAN).forEach(day => {
+      const b = document.createElement('button');
+      b.className = 'tab' + (day===activeDay?' active':'');
+      b.textContent = day.split(' – ')[0];
+      b.onclick = ()=>{ activeDay = day; renderTabs(); renderDay(); };
+      tabsEl.appendChild(b);
+    });
+  }
+
+  function defaultSetsCountFromText(txt){
+    const m1 = txt.match(/(\d+)\s*[×x]/i); if(m1) return parseInt(m1[1]);
+    const m2 = txt.match(/(\d+)\s*séries?/i); if(m2) return parseInt(m2[1]);
+    return 4;
+  }
+
+  function ensureState(saved, idx, defaultCount){
+    if(!saved[idx]) saved[idx] = { done:false, sets: Array.from({length:defaultCount}).map(()=>({peso:'',reps:''})) };
+    if(!Array.isArray(saved[idx].sets)) saved[idx].sets = Array.from({length:defaultCount}).map(()=>({peso:'',reps:''}));
+    return saved[idx];
+  }
+
+  function renderDay(){
+    const saved = load(activeDay);
+    notesEl.value = loadNotes(activeDay);
+    notesEl.oninput = () => saveNotes(activeDay, notesEl.value);
+
+    contentEl.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'card';
+    const h2 = document.createElement('h2'); h2.textContent = activeDay; card.appendChild(h2);
+
+    PLAN[activeDay].forEach((txt, idx)=>{
+      const row = document.createElement('div'); row.className='item';
+
+      const title = document.createElement('div'); title.className='titleRow';
+      const cb = document.createElement('input'); cb.type='checkbox';
+      const defaultCount = defaultSetsCountFromText(txt);
+      const state = ensureState(saved, idx, defaultCount);
+      cb.checked = !!state.done; cb.onchange = ()=>{ state.done = cb.checked; save(activeDay, saved); };
+      const t = document.createElement('div'); t.className='exTitle'; t.textContent = txt;
+      title.appendChild(cb); title.appendChild(t); row.appendChild(title);
+
+      // Controls +/- séries
+      const controls = document.createElement('div'); controls.className='controls';
+      const label = document.createElement('div'); label.className='hint'; label.textContent='Séries:';
+      const minus = document.createElement('button'); minus.textContent='−'; minus.className='btnTiny';
+      const plus = document.createElement('button'); plus.textContent='+'; plus.className='btnTiny';
+      const countEl = document.createElement('div'); countEl.className='hint';
+      function setCount(n){
+        const newN = Math.max(1, Math.min(10, n));
+        const old = state.sets.length;
+        if(newN>old){ for(let i=old;i<newN;i++){ state.sets.push({peso:'',reps:''}); } }
+        if(newN<old){ state.sets.length = newN; }
+        countEl.textContent = newN;
+        save(activeDay, saved);
+        renderSetsGrid();
+      }
+      minus.onclick = ()=> setCount(state.sets.length-1);
+      plus.onclick = ()=> setCount(state.sets.length+1);
+      countEl.textContent = state.sets.length;
+      controls.appendChild(label); controls.appendChild(minus); controls.appendChild(countEl); controls.appendChild(plus);
+      row.appendChild(controls);
+
+      const grid = document.createElement('div'); grid.className='sets';
+      function renderSetsGrid(){
+        grid.innerHTML='';
+        ['Série','Peso (kg)','Reps'].forEach(h=>{ const d=document.createElement('div'); d.textContent=h; d.className='h'; grid.appendChild(d); });
+        state.sets.forEach((s, i)=>{
+          const lab = document.createElement('div'); lab.textContent=String(i+1); lab.className='h'; grid.appendChild(lab);
+          const peso = document.createElement('input'); peso.type='number'; peso.inputMode='decimal'; peso.placeholder='ex.: 20'; peso.value = s.peso||''; peso.oninput = ()=>{ s.peso=peso.value; save(activeDay, saved); };
+          const reps = document.createElement('input'); reps.type='number'; reps.placeholder='ex.: 12'; reps.value = s.reps||''; reps.oninput = ()=>{ s.reps=reps.value; save(activeDay, saved); };
+          grid.appendChild(peso); grid.appendChild(reps);
+        });
+      }
+      renderSetsGrid();
+
+      row.appendChild(grid);
+      card.appendChild(row);
+    });
+
+    contentEl.appendChild(card);
+    save(activeDay, saved);
+  }
+
+  renderTabs();
+  renderDay();
+
+  // ------ Timer ------
+  let timerId=null; let base=45; let remaining=base;
+  const timerEl=document.getElementById('timer');
+  const timerInput=document.getElementById('timerInput');
+  function format(s){ const m=Math.floor(s/60); const ss=(s%60).toString().padStart(2,'0'); return `${m.toString().padStart(2,'0')}:${ss}` }
+  function tick(){ remaining--; timerEl.textContent = format(remaining); if(remaining<=0){ clearInterval(timerId); timerId=null; remaining=base; timerEl.textContent=format(base); try{ new Audio('data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYBYWFhYWFhYQ==').play(); }catch(e){} alert('Tempo!'); } }
+  document.getElementById('startBtn').onclick = ()=>{ if(timerId) return; timerId=setInterval(tick,1000); };
+  document.getElementById('resetBtn').onclick = ()=>{ clearInterval(timerId); timerId=null; remaining=base; timerEl.textContent=format(base); };
+  timerInput.onchange = ()=>{ const v = Math.max(10, Math.min(300, parseInt(timerInput.value||'45'))); base=v; remaining=v; timerEl.textContent=format(v); };
+
+  // ------ Actions ------
+  document.getElementById('clearDayBtn').onclick = ()=>{ if(confirm('Apagar dados do dia atual?')){ localStorage.removeItem(keyFor(activeDay)); renderDay(); } };
+  document.getElementById('clearAllBtn').onclick = ()=>{ if(confirm('Apagar TODOS os dados de treino?')){ Object.keys(localStorage).filter(k=>k.startsWith('treino-tatiane::v')).forEach(k=>localStorage.removeItem(k)); renderDay(); } };
+
+  document.getElementById('exportBtn').onclick = ()=>{
+    const data = {};
+    Object.keys(PLAN).forEach(day=>{ data[day] = { notes: loadNotes(day), data: load(day) }; });
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'treino_tatiane_export.json'; a.click(); URL.revokeObjectURL(a.href);
+  };
+
+  const importBtn = document.getElementById('importBtn');
+  const importInput = document.getElementById('importInput');
+  importBtn.onclick = ()=> importInput.click();
+  importInput.onchange = ()=>{
+    const f = importInput.files[0]; if(!f) return; const r = new FileReader();
+    r.onload = ()=>{ try{ const obj = JSON.parse(r.result); Object.keys(obj||{}).forEach(day=>{ localStorage.setItem(keyFor(day), JSON.stringify(obj[day].data||{})); localStorage.setItem(keyFor(day)+':notes', obj[day].notes||''); }); alert('Importado com sucesso!'); renderDay(); }catch(e){ alert('Arquivo inválido.'); } };
+    r.readAsText(f);
+  };
+
+  // PWA
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./service-worker.js'); }
+</script>
+</body>
+</html>
